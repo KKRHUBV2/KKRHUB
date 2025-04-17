@@ -1,8 +1,6 @@
---// Custom GUI Library โดย หอยสุดเท่
 
 local GUI = {}
 
--- สร้าง ScreenGui
 function GUI:CreateScreenGui()
     local screenGui = Instance.new("ScreenGui")
     screenGui.Name = "CustomUI"
@@ -11,7 +9,6 @@ function GUI:CreateScreenGui()
     return screenGui
 end
 
--- สร้างกรอบหลัก
 function GUI:CreateMainFrame(screenGui)
     local mainFrame = Instance.new("Frame")
     mainFrame.Size = UDim2.new(0, 300, 0, 400)
@@ -30,7 +27,6 @@ function GUI:CreateMainFrame(screenGui)
     return mainFrame
 end
 
--- สร้างปุ่มใน ScrollFrame
 function GUI:CreateButton(scrollFrame, text, callback)
     local button = Instance.new("TextButton")
     button.Text = text
@@ -48,7 +44,6 @@ function GUI:CreateButton(scrollFrame, text, callback)
     button.MouseButton1Click:Connect(callback)
 end
 
--- สร้าง TextBox
 function GUI:CreateTextBox(scrollFrame, placeholderText, callback)
     local textbox = Instance.new("TextBox")
     textbox.PlaceholderText = placeholderText
@@ -73,7 +68,21 @@ function GUI:CreateTextBox(scrollFrame, placeholderText, callback)
     return textbox
 end
 
--- สร้าง Toggle
+local function CreateLabelText(parent, text, size, textColor, position, alignment)
+    local label = Instance.new("TextLabel")
+    label.Text = text
+    label.Size = size
+    label.Position = position
+    label.BackgroundTransparency = 1
+    label.TextColor3 = textColor
+    label.Font = Enum.Font.Gotham
+    label.TextScaled = true
+    label.TextXAlignment = alignment or Enum.TextXAlignment.Center
+    label.Parent = parent
+    
+    return label
+end
+
 function GUI:CreateToggle(scrollFrame, labelText, callback)
     local toggleFrame = Instance.new("Frame")
     toggleFrame.Size = UDim2.new(1, 0, 0, 40)
@@ -135,7 +144,6 @@ function GUI:CreateToggle(scrollFrame, labelText, callback)
     return toggleFrame
 end
 
--- สร้าง Title
 function GUI:CreateTitle(mainFrame, titleText)
     local title = Instance.new("TextLabel")
     title.Text = titleText
@@ -148,7 +156,6 @@ function GUI:CreateTitle(mainFrame, titleText)
     title.Parent = mainFrame
 end
 
--- สร้างปุ่มปิด
 function GUI:CreateCloseButton(mainFrame, screenGui)
     local closeButton = Instance.new("TextButton")
     closeButton.Text = "❌"
@@ -173,7 +180,6 @@ function GUI:CreateCloseButton(mainFrame, screenGui)
     end)
 end
 
--- สร้าง ScrollFrame
 function GUI:CreateScrollFrame(mainFrame)
     local scrollFrame = Instance.new("ScrollingFrame")
     scrollFrame.Size = UDim2.new(1, 0, 1, -40)
