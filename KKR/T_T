@@ -2,7 +2,7 @@ local GUI = {}
 
 function GUI:CreateScreenGui()
     local screenGui = Instance.new("ScreenGui")
-    screenGui.Name = "CustomUI"
+    screenGui.Name = "KKRHUBUI"
     screenGui.ResetOnSpawn = false
     screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
     return screenGui
@@ -24,6 +24,42 @@ function GUI:CreateMainFrame(screenGui)
     mainCorner.Parent = mainFrame
 
     return mainFrame
+end
+
+function GUI:CreateScrollFrame(mainFrame)
+    local scrollFrame = Instance.new("ScrollingFrame")
+    scrollFrame.Size = UDim2.new(1, 0, 1, -40)
+    scrollFrame.Position = UDim2.new(0, 0, 0, 40)
+    scrollFrame.BackgroundTransparency = 1
+    scrollFrame.ScrollBarThickness = 10
+    scrollFrame.Parent = mainFrame
+
+    local layout = Instance.new("UIListLayout")
+    layout.Padding = UDim.new(0, 10)
+    layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+    layout.VerticalAlignment = Enum.VerticalAlignment.Top
+    layout.SortOrder = Enum.SortOrder.LayoutOrder
+    layout.Parent = scrollFrame
+
+    local padding = Instance.new("UIPadding")
+    padding.PaddingTop = UDim.new(0, 10)
+    padding.PaddingLeft = UDim.new(0, 20)
+    padding.PaddingRight = UDim.new(0, 20)
+    padding.Parent = scrollFrame
+
+    return scrollFrame
+end
+
+function GUI:CreateTitle(mainFrame, titleText)
+    local title = Instance.new("TextLabel")
+    title.Text = titleText
+    title.Size = UDim2.new(1, 0, 0, 30)
+    title.BackgroundTransparency = 1
+    title.TextColor3 = Color3.fromRGB(255, 255, 255)
+    title.TextScaled = true
+    title.Font = Enum.Font.GothamBold
+    title.LayoutOrder = 1
+    title.Parent = mainFrame
 end
 
 function GUI:CreateButton(scrollFrame, text, callback)
@@ -143,18 +179,6 @@ function GUI:CreateToggle(scrollFrame, labelText, callback)
     return toggleFrame
 end
 
-function GUI:CreateTitle(mainFrame, titleText)
-    local title = Instance.new("TextLabel")
-    title.Text = titleText
-    title.Size = UDim2.new(1, 0, 0, 30)
-    title.BackgroundTransparency = 1
-    title.TextColor3 = Color3.fromRGB(255, 255, 255)
-    title.TextScaled = true
-    title.Font = Enum.Font.GothamBold
-    title.LayoutOrder = 1
-    title.Parent = mainFrame
-end
-
 function GUI:CreateCloseButton(mainFrame, screenGui)
     local closeButton = Instance.new("TextButton")
     closeButton.Text = "❌"
@@ -177,30 +201,6 @@ function GUI:CreateCloseButton(mainFrame, screenGui)
         wait(0.4)
         screenGui:Destroy()
     end)
-end
-
-function GUI:CreateScrollFrame(mainFrame)
-    local scrollFrame = Instance.new("ScrollingFrame")
-    scrollFrame.Size = UDim2.new(1, 0, 1, -40)
-    scrollFrame.Position = UDim2.new(0, 0, 0, 40)
-    scrollFrame.BackgroundTransparency = 1
-    scrollFrame.ScrollBarThickness = 10
-    scrollFrame.Parent = mainFrame
-
-    local layout = Instance.new("UIListLayout")
-    layout.Padding = UDim.new(0, 10)
-    layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
-    layout.VerticalAlignment = Enum.VerticalAlignment.Top
-    layout.SortOrder = Enum.SortOrder.LayoutOrder
-    layout.Parent = scrollFrame
-
-    local padding = Instance.new("UIPadding")
-    padding.PaddingTop = UDim.new(0, 10)
-    padding.PaddingLeft = UDim.new(0, 20)
-    padding.PaddingRight = UDim.new(0, 20)
-    padding.Parent = scrollFrame
-
-    return scrollFrame
 end
 
 return GUI
