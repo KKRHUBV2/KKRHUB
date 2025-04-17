@@ -1,11 +1,11 @@
+-- By KKRHUB
 
 local GUI = {}
-
 function GUI:CreateScreenGui()
     local screenGui = Instance.new("ScreenGui")
-    screenGui.Name = "CustomUI"
+    screenGui.Name = "KKRHUBGui"
     screenGui.ResetOnSpawn = false
-    screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+    screenGui.Parent = game.Players.LocalPlayer:WaitForChild("CoreGui")
     return screenGui
 end
 
