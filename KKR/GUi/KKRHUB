@@ -1,0 +1,241 @@
+local GUI = {}
+
+function GUI:CreateScreenGui()
+    local screenGui = Instance.new("ScreenGui")
+    screenGui.Name = "KKRHUBUI"
+    screenGui.ResetOnSpawn = false
+    screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+    return screenGui
+end
+
+function GUI:CreateMainFrame(screenGui)
+    local mainFrame = Instance.new("Frame")
+    mainFrame.Size = UDim2.new(0, 300, 0, 400)
+    mainFrame.Position = UDim2.new(0.5, -150, 0.5, -200)
+    mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    mainFrame.BorderSizePixel = 0
+    mainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+    mainFrame.Active = true
+    mainFrame.Draggable = true
+    mainFrame.Parent = screenGui
+
+    local mainCorner = Instance.new("UICorner")
+    mainCorner.CornerRadius = UDim.new(0, 12)
+    mainCorner.Parent = mainFrame
+
+    return mainFrame
+end
+
+function GUI:CreateScrollFrame(mainFrame)
+    local scrollFrame = Instance.new("ScrollingFrame")
+    scrollFrame.Size = UDim2.new(1, 0, 1, -40)
+    scrollFrame.Position = UDim2.new(0, 0, 0, 40)
+    scrollFrame.BackgroundTransparency = 1
+    scrollFrame.ScrollBarThickness = 10
+    scrollFrame.Parent = mainFrame
+
+    local layout = Instance.new("UIListLayout")
+    layout.Padding = UDim.new(0, 10)
+    layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+    layout.VerticalAlignment = Enum.VerticalAlignment.Top
+    layout.SortOrder = Enum.SortOrder.LayoutOrder
+    layout.Parent = scrollFrame
+
+    local padding = Instance.new("UIPadding")
+    padding.PaddingTop = UDim.new(0, 10)
+    padding.PaddingLeft = UDim.new(0, 20)
+    padding.PaddingRight = UDim.new(0, 20)
+    padding.Parent = scrollFrame
+
+    return scrollFrame
+end
+
+function GUI:CreateTitle(mainFrame, titleText)
+    local title = Instance.new("TextLabel")
+    title.Text = titleText
+    title.Size = UDim2.new(1, 0, 0, 30)
+    title.BackgroundTransparency = 1
+    title.TextColor3 = Color3.fromRGB(255, 255, 255)
+    title.TextScaled = true
+    title.Font = Enum.Font.GothamBold
+    title.LayoutOrder = 1
+    title.Parent = mainFrame
+end
+
+function GUI:CreateButton(scrollFrame, text, callback)
+    local button = Instance.new("TextButton")
+    button.Text = text
+    button.Size = UDim2.new(1, 0, 0, 40)
+    button.BackgroundColor3 = Color3.fromRGB(50, 120, 255)
+    button.TextColor3 = Color3.new(1, 1, 1)
+    button.Font = Enum.Font.GothamMedium
+    button.TextScaled = true
+    button.Parent = scrollFrame
+
+    local btnCorner = Instance.new("UICorner")
+    btnCorner.CornerRadius = UDim.new(0, 8)
+    btnCorner.Parent = button
+
+    button.MouseButton1Click:Connect(callback)
+end
+
+function GUI:CreateTextBox(scrollFrame, placeholderText, callback)
+    local textbox = Instance.new("TextBox")
+    textbox.PlaceholderText = placeholderText
+    textbox.Size = UDim2.new(1, 0, 0, 40)
+    textbox.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    textbox.TextColor3 = Color3.new(1, 1, 1)
+    textbox.Font = Enum.Font.Gotham
+    textbox.TextScaled = true
+    textbox.ClearTextOnFocus = false
+    textbox.Parent = scrollFrame
+
+    local textboxCorner = Instance.new("UICorner")
+    textboxCorner.CornerRadius = UDim.new(0, 8)
+    textboxCorner.Parent = textbox
+
+    textbox.FocusLost:Connect(function(enter)
+        if enter then
+            callback(textbox.Text)
+        end
+    end)
+
+    return textbox
+end
+
+local function CreateLabelText(parent, text, size, textColor, position, alignment)
+    local label = Instance.new("TextLabel")
+    label.Text = text
+    label.Size = size
+    label.Position = position
+    label.BackgroundTransparency = 1
+    label.TextColor3 = textColor
+    label.Font = Enum.Font.Gotham
+    label.TextScaled = true
+    label.TextXAlignment = alignment or Enum.TextXAlignment.Center
+    label.Parent = parent
+    
+    return label
+end
+
+function GUI:CreateToggle(scrollFrame, text, callback)
+    local toggleHolder = Instance.new("Frame")
+    toggleHolder.Size = UDim2.new(1, 0, 0, 50)
+    toggleHolder.BackgroundTransparency = 1
+    toggleHolder.Parent = scrollFrame
+
+    local label = Instance.new("TextLabel")
+    label.Text = text
+    label.Size = UDim2.new(0.6, 0, 1, 0)
+    label.Position = UDim2.new(0, 0, 0, 0)
+    label.BackgroundTransparency = 1
+    label.TextColor3 = Color3.fromRGB(255, 255, 255)
+    label.TextScaled = true
+    label.Font = Enum.Font.Gotham
+    label.Parent = toggleHolder
+
+    local toggle = Instance.new("TextButton")
+    toggle.Size = UDim2.new(0, 50, 0, 25)
+    toggle.Position = UDim2.new(1, -60, 0.5, -12)
+    toggle.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+    toggle.Text = ""
+    toggle.AutoButtonColor = false
+    toggle.Parent = toggleHolder
+
+    local toggleCorner = Instance.new("UICorner")
+    toggleCorner.CornerRadius = UDim.new(1, 0)
+    toggleCorner.Parent = toggle
+
+    local circle = Instance.new("Frame")
+    circle.Size = UDim2.new(0.5, -4, 1, -4)
+    circle.Position = UDim2.new(0, 2, 0, 2)
+    circle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    circle.Parent = toggle
+
+    local circleCorner = Instance.new("UICorner")
+    circleCorner.CornerRadius = UDim.new(1, 0)
+    circleCorner.Parent = circle
+
+    local state = false
+
+    toggle.MouseButton1Click:Connect(function()
+        state = not state
+
+        if state then
+            toggle.BackgroundColor3 = Color3.fromRGB(50, 200, 100)
+            circle:TweenPosition(UDim2.new(1, -27, 0, 2), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.2, true)
+        else
+            toggle.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+            circle:TweenPosition(UDim2.new(0, 2, 0, 2), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.2, true)
+        end
+
+        callback(state)
+    end)
+end
+
+function GUI:CreateLabelText(parent, text)
+    local label = Instance.new("TextLabel")
+    label.Text = text
+    label.Size = UDim2.new(1, 0, 0, 30)
+    label.BackgroundTransparency = 1
+    label.TextColor3 = Color3.fromRGB(255, 255, 255)
+    label.Font = Enum.Font.Gotham
+    label.TextScaled = true
+    label.Parent = parent
+
+    return label
+end
+
+
+-- ฟังก์ชันสำหรับปุ่มปิด (Close Button)
+function GUI:CreateCloseButton(mainFrame, screenGui)
+    local closeButton = Instance.new("TextButton")
+    closeButton.Text = "❌"
+    closeButton.Size = UDim2.new(0, 30, 0, 30)
+    closeButton.Position = UDim2.new(1, -35, 0, 5)
+    closeButton.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+    closeButton.TextColor3 = Color3.new(1, 1, 1)
+    closeButton.Font = Enum.Font.GothamBold
+    closeButton.TextScaled = true
+    closeButton.BackgroundTransparency = 1
+    closeButton.Parent = mainFrame
+    closeButton.ZIndex = 2
+
+    local closeCorner = Instance.new("UICorner")
+    closeCorner.CornerRadius = UDim.new(1, 0)
+    closeCorner.Parent = closeButton
+
+    closeButton.MouseButton1Click:Connect(function()
+        screenGui:Destroy() -- ลบ GUI
+    end)
+end
+
+-- ฟังก์ชันสำหรับปุ่มย่อ (Minimize)
+function GUI:CreateMinimizeButton(mainFrame)
+    local minimizeButton = Instance.new("TextButton")
+    minimizeButton.Text = "-"
+    minimizeButton.Size = UDim2.new(0, 30, 0, 30)
+    minimizeButton.Position = UDim2.new(1, -70, 0, 5) -- ปรับตำแหน่ง
+    minimizeButton.BackgroundColor3 = Color3.fromRGB(200, 150, 50)
+    minimizeButton.TextColor3 = Color3.new(1, 1, 1)
+    minimizeButton.Font = Enum.Font.GothamBold
+    minimizeButton.TextScaled = true
+    minimizeButton.BackgroundTransparency = 1
+    minimizeButton.Parent = mainFrame
+    minimizeButton.ZIndex = 2
+
+    local minimizeCorner = Instance.new("UICorner")
+    minimizeCorner.CornerRadius = UDim.new(1, 0)
+    minimizeCorner.Parent = minimizeButton
+
+    -- สถานะของการย่อ
+    local isMinimized = false
+    minimizeButton.MouseButton1Click:Connect(function()
+        if isMinimized then
+            mainFrame:TweenSize(UDim2.new(0, 300, 0, 400), Enum.EasingDirection.Out, Enum.EasingStyle.Quint, 0.4, true)
+        else
+            mainFrame:TweenSize(UDim2.new(0, 300, 0, 40), Enum.EasingDirection.Out, Enum.EasingStyle.Quint, 0.4, true)
+        end
+        isMinimized = not isMinimized
+    end)
+end
