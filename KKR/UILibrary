@@ -5,7 +5,7 @@ function GUI:CreateScreenGui()
     local screenGui = Instance.new("ScreenGui")
     screenGui.Name = "KKRHUBGui"
     screenGui.ResetOnSpawn = false
-    screenGui.Parent = game.Players.LocalPlayer:WaitForChild("CoreGui")
+    screenGui.Parent = game.CoreGui
     return screenGui
 end
 
