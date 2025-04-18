@@ -118,7 +118,7 @@ transportSection:NewToggle("Auto-Farm2", "ToggleAutoFarm", function(state)
                     end
                 end
 
-                task.wait(5) -- รอรอบถัดไป (ปรับตามความเร็วที่ต้องการ)
+                task.wait(3) -- รอรอบถัดไป (ปรับตามความเร็วที่ต้องการ)
             end
         end)
     else
