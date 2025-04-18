@@ -1,0 +1,88 @@
+local DiscordLib = loadstring(game:HttpGet"https://raw.githubusercontent.com/dawid-scripts/UI-Libs/main/discord%20lib.txt")()
+
+local win = DiscordLib:Window("KKR HUB")
+
+local serv = win:Server("หมวดหมู่", "rbxassetid://13440848912")
+
+local tgls = serv:Channel("Auto-Farm-ขนส่ง")
+local autofarm = false
+
+tgls:Toggle("Auto-Farm", false, function(bool)
+    autofarm = bool
+
+    task.spawn(function()
+        while autofarm do
+            local player = game.Players.LocalPlayer
+            local char = player.Character
+            local customerName = player.Name .. "_Customer"
+
+            local function pressPrompt(prompt)
+                if prompt then
+                    prompt.HoldDuration = 0
+                    prompt:InputHoldBegin()
+                    wait(prompt.HoldDuration or 0)
+                    prompt:InputHoldEnd()
+                    return true
+                end
+                return false
+            end
+
+            local customer
+            while autofarm do
+                if char and char:FindFirstChild("HumanoidRootPart") then
+                    char.HumanoidRootPart.CFrame = CFrame.new(373.683746, 10.8152561, 121.489975)
+                end
+
+                task.wait(0.5)
+
+                local prompt = workspace:FindFirstChild("Deliverys")
+                    and workspace.Deliverys:FindFirstChild("Transport")
+                    and workspace.Deliverys.Transport:FindFirstChild("Interact")
+                    and workspace.Deliverys.Transport.Interact:FindFirstChild("Prompt")
+
+                if not pressPrompt(prompt) then
+                    warn("ไม่พบ Prompt รับเควส")
+                    break
+                end
+
+                task.wait(0.5)
+
+                customer = workspace:FindFirstChild(customerName)
+                if customer and customer:FindFirstChild("HumanoidRootPart") then
+                    break
+                end
+
+                -- เพิ่มเงื่อนไขเช็ค Navigate
+                local navigatePart = workspace:FindFirstChild("Deliverys")
+                    and workspace.Deliverys:FindFirstChild("Transport")
+                    and workspace.Deliverys.Transport:FindFirstChild("PickupStores")
+                    and workspace.Deliverys.Transport.PickupStores:FindFirstChild("Part")
+                    and workspace.Deliverys.Transport.PickupStores.Part:FindFirstChild("Navigate")
+
+                if navigatePart and char and char:FindFirstChild("HumanoidRootPart") then
+                    warn("ไม่เจอลูกค้า วาร์ปไปหา Navigate")
+                    char.HumanoidRootPart.CFrame = navigatePart.CFrame + Vector3.new(0, 3, 0)
+                    task.wait(2)
+                    break
+                end
+
+                task.wait(0.5)
+            end
+
+            if not autofarm then return end
+
+            if customer and customer:FindFirstChild("HumanoidRootPart") then
+                local hrp = customer.HumanoidRootPart
+                local frontPos = hrp.Position + hrp.CFrame.LookVector * 3
+                char.HumanoidRootPart.CFrame = CFrame.new(frontPos, hrp.Position)
+
+                task.wait(5)
+
+                local deliverPrompt = hrp:FindFirstChild("Prompt")
+                pressPrompt(deliverPrompt)
+            end
+
+            task.wait(2)
+        end
+    end)
+end)
