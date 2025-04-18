@@ -67,19 +67,16 @@ transportSection:NewButton("กดรับพนักงานส่งขอ�
 end)
 -------------------------------------------------------------------------
 
-
 local toggleRunning = false
 
--- สร้าง Toggle สำหรับเปิด/ปิด Auto-Farm
 transportSection:NewToggle("Auto-Farm2", "ToggleAutoFarm", function(state)
-    toggleRunning = state  -- เก็บสถานะการเปิด/ปิดระบบ Auto-Farm
+    toggleRunning = state
 
     if toggleRunning then
         print("เปิดระบบ Auto-Farm")
-        -- เริ่มการทำงานเมื่อเปิด Auto-Farm
         task.spawn(function()
             while toggleRunning do
-                -- ขั้นตอนแรก: Interact ก่อน
+                -- Interact ก่อน
                 for _, item in pairs(workspace.Deliverys.Transport.Interact:GetDescendants()) do
                     if not toggleRunning then return end
                     if item:IsA("ProximityPrompt") then
@@ -92,8 +89,17 @@ transportSection:NewToggle("Auto-Farm2", "ToggleAutoFarm", function(state)
                 local player = game.Players.LocalPlayer
                 local character = workspace:FindFirstChild(player.Name .. "_Customer")
 
-                -- ถ้าไม่มี character ให้ไปกด PickupStores
-                if not character then
+                -- ถ้ามี _Customer แล้ว ข้ามไปขั้นตอนสุดท้ายเลย
+                if character then
+                    local hrp = character:FindFirstChild("HumanoidRootPart")
+                    if hrp then
+                        local prompt = hrp:FindFirstChildWhichIsA("ProximityPrompt")
+                        if prompt then
+                            fireproximityprompt(prompt)
+                        end
+                    end
+                else
+                    -- ถ้าไม่มี _Customer ให้กด PickupStores
                     for _, part in pairs(workspace.Deliverys.Transport.PickupStores:GetChildren()) do
                         if not toggleRunning then return end
                         local prompt = part:FindFirstChildWhichIsA("ProximityPrompt")
@@ -104,28 +110,28 @@ transportSection:NewToggle("Auto-Farm2", "ToggleAutoFarm", function(state)
                     end
 
                     task.wait(3)
-                    character = workspace:FindFirstChild(player.Name .. "_Customer")
-                end
 
-                -- ถ้ายังไม่มี character หลังจาก PickupStores → กลับไป Interact ใหม่ในรอบถัดไป
-                if character then
-                    local hrp = character:FindFirstChild("HumanoidRootPart")
-                    if hrp then
-                        local prompt = hrp:FindFirstChildWhichIsA("ProximityPrompt")
-                        if prompt then
-                            fireproximityprompt(prompt)
+                    -- เช็คอีกทีหลังจาก Pickup
+                    character = workspace:FindFirstChild(player.Name .. "_Customer")
+                    if character then
+                        local hrp = character:FindFirstChild("HumanoidRootPart")
+                        if hrp then
+                            local prompt = hrp:FindFirstChildWhichIsA("ProximityPrompt")
+                            if prompt then
+                                fireproximityprompt(prompt)
+                            end
                         end
                     end
                 end
 
-                task.wait(5) -- รอรอบถัดไป (ปรับตามความเร็วที่ต้องการ)
+                task.wait(5)
             end
         end)
     else
         print("ปิดระบบ Auto-Farm")
-        -- หยุดการทำงานเมื่อปิด Auto-Farm
     end
 end)
+
 
 -----------------------------------------------------------------------
 local autofarm = false
