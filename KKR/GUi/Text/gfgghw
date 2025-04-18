@@ -1,0 +1,361 @@
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
+local Window = Library.CreateLib("KKR HUB", "DarkTheme")
+
+
+local ScreenGui = Instance.new("ScreenGui")
+local lego = Instance.new("Frame")
+local ImageButton = Instance.new("ImageButton")
+local UICorner = Instance.new("UICorner")
+local UICorner_2 = Instance.new("UICorner")
+
+
+ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+lego.Name = "lego"
+lego.Parent = ScreenGui
+lego.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+lego.BorderColor3 = Color3.fromRGB(0, 0, 0)
+lego.BorderSizePixel = 0
+lego.Position = UDim2.new(0.0686398149, 0, 0.391461551, 0)
+lego.Size = UDim2.new(0, 65, 0, 57)
+lego.Draggable = true
+lego.Active = true
+
+ImageButton.Parent = lego
+ImageButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+ImageButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
+ImageButton.BorderSizePixel = 0
+ImageButton.Position = UDim2.new(0.119444512, 0, 0.15061067, 0)
+ImageButton.Size = UDim2.new(0, 47, 0, 40)
+ImageButton.Image = "rbxassetid://13440861942"
+ImageButton.MouseButton1Click:Connect(function()
+	Library:ToggleUI()
+end)
+
+UICorner.Parent = ImageButton
+
+UICorner_2.Parent = lego
+
+local transportTab = Window:NewTab("Auto Farm ขนส่ง")
+local transportSection = transportTab:NewSection("งานขนส่ง")
+
+transportSection:NewButton("มาเซเว่น", "ButtonInfo", function()
+    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(185.798004, 9.98398209, 111.57753, 0.839848876, 9.46051415e-08, -0.542820275, -4.66568828e-08, 1, 1.02097161e-07, 0.542820275, -6.0419886e-08, 0.839848876)
+
+end)
+transportSection:NewButton("กดรับพนักงานส่งของ", "ButtonInfo", function()
+    local prompt = workspace:FindFirstChild("Map")
+        and workspace.Map:FindFirstChild("NPC")
+        and workspace.Map.NPC:FindFirstChild("Transport")
+        and workspace.Map.NPC.Transport:FindFirstChild("HumanoidRootPart")
+        and workspace.Map.NPC.Transport.HumanoidRootPart:FindFirstChild("Prompt")
+    
+    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(363.922485, 10.9312849, 138.672516, -0.999988616, 1.57026214e-08, -0.00476670265, 1.52452895e-08, 1, 9.59793809e-08, 0.00476670265, 9.59056194e-08, -0.999988616)
+
+    if prompt then
+        task.spawn(function()
+            wait(0.2)
+            prompt:InputHoldBegin()
+            wait(prompt.HoldDuration or 0)
+            prompt:InputHoldEnd()
+        end)
+        print("k")
+    else
+        print("x")
+    end
+end)
+-------------------------------------------------------------------------
+
+
+local toggleRunning = false
+
+-- สร้าง Toggle สำหรับเปิด/ปิด Auto-Farm
+transportSection:NewToggle("Auto-Farm2", "ToggleAutoFarm", function(state)
+    toggleRunning = state  -- เก็บสถานะการเปิด/ปิดระบบ Auto-Farm
+
+    if toggleRunning then
+        print("เปิดระบบ Auto-Farm")
+        -- เริ่มการทำงานเมื่อเปิด Auto-Farm
+        task.spawn(function()
+            while toggleRunning do
+                -- ขั้นตอนแรก: Interact ก่อน
+                for _, item in pairs(workspace.Deliverys.Transport.Interact:GetDescendants()) do
+                    if not toggleRunning then return end
+                    if item:IsA("ProximityPrompt") then
+                        fireproximityprompt(item)
+                    end
+                end
+
+                task.wait(3)
+
+                local player = game.Players.LocalPlayer
+                local character = workspace:FindFirstChild(player.Name .. "_Customer")
+
+                -- ถ้าไม่มี character ให้ไปกด PickupStores
+                if not character then
+                    for _, part in pairs(workspace.Deliverys.Transport.PickupStores:GetChildren()) do
+                        if not toggleRunning then return end
+                        local prompt = part:FindFirstChildWhichIsA("ProximityPrompt")
+                        if prompt then
+                            fireproximityprompt(prompt)
+                            break
+                        end
+                    end
+
+                    task.wait(3)
+                    character = workspace:FindFirstChild(player.Name .. "_Customer")
+                end
+
+                -- ถ้ายังไม่มี character หลังจาก PickupStores → กลับไป Interact ใหม่ในรอบถัดไป
+                if character then
+                    local hrp = character:FindFirstChild("HumanoidRootPart")
+                    if hrp then
+                        local prompt = hrp:FindFirstChildWhichIsA("ProximityPrompt")
+                        if prompt then
+                            fireproximityprompt(prompt)
+                        end
+                    end
+                end
+
+                task.wait(5) -- รอรอบถัดไป (ปรับตามความเร็วที่ต้องการ)
+            end
+        end)
+    else
+        print("ปิดระบบ Auto-Farm")
+        -- หยุดการทำงานเมื่อปิด Auto-Farm
+    end
+end)
+
+-----------------------------------------------------------------------
+local autofarm = false
+local autofarmThread = nil
+
+transportSection:NewToggle("Auto-Farm", "ToggleInfo", function(state)
+    autofarm = state
+
+    if autofarm then
+        autofarmThread = task.spawn(function()
+            while autofarm do
+                local player = game.Players.LocalPlayer
+                local char = player.Character or player.CharacterAdded:Wait()
+                local customerName = player.Name .. "_Customer"
+
+                local function pressPrompt(prompt)
+                    if prompt then
+                        prompt.HoldDuration = 0
+                        prompt:InputHoldBegin()
+                        wait(prompt.HoldDuration or 0)
+                        prompt:InputHoldEnd()
+                        return true
+                    end
+                    return false
+                end
+
+                if char and char:FindFirstChild("HumanoidRootPart") then
+                    char.HumanoidRootPart.CFrame = CFrame.new(373.683746, 10.8152561, 121.489975)
+                end
+
+                task.wait(0.5)
+
+                local prompt = workspace:FindFirstChild("Deliverys")
+                    and workspace.Deliverys:FindFirstChild("Transport")
+                    and workspace.Deliverys.Transport:FindFirstChild("Interact")
+                    and workspace.Deliverys.Transport.Interact:FindFirstChild("Prompt")
+
+                if not pressPrompt(prompt) then
+                    warn("ไม่พบ Prompt รับเควส")
+                    break
+                end
+
+                task.wait(0.5)
+
+                local customer = workspace:FindFirstChild(customerName)
+                if customer and customer:FindFirstChild("HumanoidRootPart") then
+                    local hrp = customer.HumanoidRootPart
+                    local frontPos = hrp.Position + hrp.CFrame.LookVector * 3
+                    char.HumanoidRootPart.CFrame = CFrame.new(frontPos, hrp.Position)
+
+                    task.wait(5)
+
+                    local deliverPrompt = hrp:FindFirstChild("Prompt")
+                    pressPrompt(deliverPrompt)
+                end
+
+                task.wait(2)
+            end
+        end)
+    else
+        print("Auto-Farm ถูกปิด")
+    end
+end)
+
+-- Tab ขนส่งเซเว่น
+local sevenTab = Window:NewTab("Auto Farm ขนส่งเซเว่น")
+local sevenSection = sevenTab:NewSection("งานขนส่งเซเว่น")
+
+sevenSection:NewButton("กดรับพนักงานส่งของ", "ButtonInfo", function()
+    local prompt = workspace:FindFirstChild("Map")
+        and workspace.Map:FindFirstChild("NPC")
+        and workspace.Map.NPC:FindFirstChild("Jane")
+        and workspace.Map.NPC.Jane:FindFirstChild("HumanoidRootPart")
+        and workspace.Map.NPC.Jane.HumanoidRootPart:FindFirstChild("Prompt")
+
+    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(176.876495, 9.53128242, 104.584045, -0.999860346, -7.86308352e-09, -0.0167120416, -9.63375157e-09, 1, 1.05871131e-07, 0.0167120416, 1.06017346e-07, -0.999860346)
+
+    if prompt then
+        task.spawn(function()
+            wait(0.2)
+            prompt:InputHoldBegin()
+            wait(prompt.HoldDuration or 0)
+            prompt:InputHoldEnd()
+        end)
+        print("k")
+    else
+        print("x")
+    end
+end)
+sevenSection:NewToggle("Auto-Farm", "ToggleInfo", function(state)
+    autofarmSeven = state
+
+    task.spawn(function()
+        while autofarmSeven do
+            local player = game.Players.LocalPlayer
+            local char = player.Character
+            local customerName = player.Name .. "_Customer"
+
+            local function pressPrompt(prompt)
+                if prompt then
+                    prompt.HoldDuration = 0
+                    prompt:InputHoldBegin()
+                    wait(prompt.HoldDuration or 0)
+                    prompt:InputHoldEnd()
+                    return true
+                end
+                return false
+            end
+
+            -- เช็คว่า Character มี HumanoidRootPart หรือไม่
+            if char and char:FindFirstChild("HumanoidRootPart") then
+                -- วาร์ปไปยังตำแหน่งที่ต้องการ
+                char.HumanoidRootPart.CFrame = CFrame.new(192.929321, 9.84004784, 107.139648, -0.999390841, 2.43198102e-08, 0.0348989069, 2.58237911e-08, 1, 4.26446256e-08, -0.0348989069, 4.35198722e-08, -0.999390841)
+            else
+                warn("ไม่พบ HumanoidRootPart ใน Character")
+                break
+            end
+
+            task.wait(0.5)
+
+            -- หา Prompt ใน Delivery
+            local prompt = workspace:FindFirstChild("Deliverys")
+                and workspace.Deliverys:FindFirstChild("7-Eleven")
+                and workspace.Deliverys["7-Eleven"]:FindFirstChild("Interact")
+                and workspace.Deliverys["7-Eleven"].Interact:FindFirstChild("Cube.003_Cube.005")
+                and workspace.Deliverys["7-Eleven"].Interact["Cube.003_Cube.005"]:FindFirstChild("Prompt")
+
+            if not prompt then
+                warn("ไม่พบ Prompt ในการรับเควส")
+                break
+            end
+
+            -- กด Prompt
+            if not pressPrompt(prompt) then
+                warn("ไม่สามารถกด Prompt ได้")
+                break
+            end
+
+            task.wait(0.5)
+
+            -- เช็คว่า Customer มาถึงหรือยัง
+            local customer = workspace:FindFirstChild(customerName)
+            if customer and customer:FindFirstChild("HumanoidRootPart") then
+                break -- เมื่อเจอลูกค้าจะหยุดทำงาน
+            else
+                warn("ไม่พบลูกค้า: " .. customerName)
+            end
+
+            task.wait(0.5)
+        end
+
+        -- เมื่อปิด Auto-farm จะเช็คว่าไม่ได้ทำงานต่อ
+        if not autofarmSeven then return end
+
+        -- วาร์ปไปหาลูกค้า
+        local customer = workspace:FindFirstChild(customerName)
+        if customer and customer:FindFirstChild("HumanoidRootPart") then
+            local hrp = customer.HumanoidRootPart
+            local frontPos = hrp.Position + hrp.CFrame.LookVector * 3
+            char.HumanoidRootPart.CFrame = CFrame.new(frontPos, hrp.Position)
+
+            task.wait(5)
+
+            -- กดส่งของ
+            local deliverPrompt = hrp:FindFirstChild("Prompt")
+            if deliverPrompt then
+                pressPrompt(deliverPrompt)
+            else
+                warn("ไม่พบ Prompt ลูกค้า")
+            end
+        end
+
+        task.wait(2)
+    end)
+end)
+
+
+-- Tab จับโจร
+local criminalTab = Window:NewTab("Auto จับโจร")
+local criminalSection = criminalTab:NewSection("งานจับโจร")
+
+criminalSection:NewButton("กดรับตำรวจ", "ButtonInfo", function()
+    local prompt = workspace:FindFirstChild("Map")
+        and workspace.Map:FindFirstChild("NPC")
+        and workspace.Map.NPC:FindFirstChild("Police")
+        and workspace.Map.NPC.Police:FindFirstChild("HumanoidRootPart")
+        and workspace.Map.NPC.Police.HumanoidRootPart:FindFirstChild("Prompt")
+
+    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(57.1494942, 11.4312811, 166.179779, 0.999390781, -1.18500525e-08, -0.0349001735, 8.28150437e-09, 1, -1.02394715e-07, 0.0349001735, 1.02043309e-07, 0.999390781)
+
+    if prompt then
+        task.spawn(function()
+            wait(0.2)
+            prompt:InputHoldBegin()
+            wait(prompt.HoldDuration or 0)
+            prompt:InputHoldEnd()
+        end)
+        print("K")
+    else
+        print("X")
+    end
+end)
+
+local catchCriminal = false
+
+criminalSection:NewToggle("Auto จับโจร", "ToggleInfo", function(state)
+    catchCriminal = state
+
+    task.spawn(function()
+        while catchCriminal do
+            local myChar = game.Players.LocalPlayer.Character
+
+            -- วนเช็คผู้เล่นที่มี Wanted
+            for _, player in pairs(game.Players:GetPlayers()) do
+                local targetChar = player.Character
+                if targetChar and targetChar:FindFirstChild("Head") then
+                    local head = targetChar.Head
+                    if head:FindFirstChild("Wanted") then 
+                        local targetHRP = targetChar:FindFirstChild("HumanoidRootPart")
+                        
+                        if targetHRP then
+                            local frontPos = targetHRP.Position + targetHRP.CFrame.LookVector * 3
+                            myChar.HumanoidRootPart.CFrame = CFrame.new(frontPos, targetHRP.Position)
+                            task.wait(0.5)
+                        end
+                    end
+                end
+            end
+
+            task.wait(1)
+        end
+    end)
+end)
