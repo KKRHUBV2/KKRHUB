@@ -1,0 +1,57 @@
+local toggleRunning = false
+
+GUI:CreateToggle(scrollFrame, "เปิด/ปิด ระบบ", function(isOn)
+    toggleRunning = isOn
+
+    if isOn then
+        print("เปิดระบบ")
+
+        task.spawn(function()
+            while toggleRunning do
+                -- ขั้นตอนแรก: Interact ก่อน
+                for _, item in pairs(workspace.Deliverys.Transport.Interact:GetDescendants()) do
+                    if not toggleRunning then return end
+                    if item:IsA("ProximityPrompt") then
+                        fireproximityprompt(item)
+                    end
+                end
+
+                task.wait(1)
+
+                local player = game.Players.LocalPlayer
+                local character = workspace:FindFirstChild(player.Name .. "_Customer")
+
+                -- ถ้าไม่มี character ให้ไปกด PickupStores
+                if not character then
+                    for _, part in pairs(workspace.Deliverys.Transport.PickupStores:GetChildren()) do
+                        if not toggleRunning then return end
+                        local prompt = part:FindFirstChildWhichIsA("ProximityPrompt")
+                        if prompt then
+                            fireproximityprompt(prompt)
+                            break
+                        end
+                    end
+
+                    task.wait(1)
+                    character = workspace:FindFirstChild(player.Name .. "_Customer")
+                end
+
+                -- ถ้ายังไม่มี character หลังจาก PickupStores → กลับไป Interact ใหม่ในรอบถัดไป
+                if character then
+                    local hrp = character:FindFirstChild("HumanoidRootPart")
+                    if hrp then
+                        local prompt = hrp:FindFirstChildWhichIsA("ProximityPrompt")
+                        if prompt then
+                            fireproximityprompt(prompt)
+                        end
+                    end
+                end
+
+                task.wait(2) -- รอรอบถัดไป (ปรับตามความเร็วที่ต้องการ)
+            end
+        end)
+
+    else
+        print("ปิดระบบ")
+    end
+end)
