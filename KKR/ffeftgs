@@ -76,7 +76,7 @@ transportSection:NewToggle("Auto-Farm2", "ToggleAutoFarm", function(state)
         print("เปิดระบบ Auto-Farm")
         task.spawn(function()
             while toggleRunning do
-                -- Interact ก่อน
+                -- ขั้นตอนแรก: Interact ก่อน
                 for _, item in pairs(workspace.Deliverys.Transport.Interact:GetDescendants()) do
                     if not toggleRunning then return end
                     if item:IsA("ProximityPrompt") then
@@ -89,7 +89,7 @@ transportSection:NewToggle("Auto-Farm2", "ToggleAutoFarm", function(state)
                 local player = game.Players.LocalPlayer
                 local character = workspace:FindFirstChild(player.Name .. "_Customer")
 
-                -- ถ้ามี _Customer แล้ว ข้ามไปขั้นตอนสุดท้ายเลย
+                -- ถ้ามี _Customer แล้ว ข้ามขั้นตอน PickupStores ไปกดที่ตัวละครเลย
                 if character then
                     local hrp = character:FindFirstChild("HumanoidRootPart")
                     if hrp then
@@ -111,7 +111,7 @@ transportSection:NewToggle("Auto-Farm2", "ToggleAutoFarm", function(state)
 
                     task.wait(3)
 
-                    -- เช็คอีกทีหลังจาก Pickup
+                    -- หลังจาก PickupStores แล้วพยายามกดที่ตัวละครอีกที
                     character = workspace:FindFirstChild(player.Name .. "_Customer")
                     if character then
                         local hrp = character:FindFirstChild("HumanoidRootPart")
@@ -131,6 +131,7 @@ transportSection:NewToggle("Auto-Farm2", "ToggleAutoFarm", function(state)
         print("ปิดระบบ Auto-Farm")
     end
 end)
+
 
 
 -----------------------------------------------------------------------
